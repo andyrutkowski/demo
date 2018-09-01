@@ -17,7 +17,7 @@
 <style>
     #menu {
         background: #fff;
-        position: absolute;
+        position: relative;
         z-index: 1;
         top: 10px;
         right: 10px;
@@ -70,6 +70,24 @@ var map = new mapboxgl.Map({
     center: [-118.296271, 33.989834]
 });
 
+  map.on('click', function(e) {
+  var features = map.queryRenderedFeatures(e.point, {
+    layers: ['47greenbook-dapl9g'] // replace this with the name of the layer
+  });
+
+  if (!features.length) {
+    return;
+  }
+
+  var feature = features[0];
+
+  var popup = new mapboxgl.Popup({ offset: [0, -15] })
+    .setLngLat(feature.geometry.coordinates)
+    .setHTML('<h3>' + feature.properties.Name + '</h3><p>' + feature.properties.Type + '</p>')
+    .setLngLat(feature.geometry.coordinates)
+    .addTo(map);
+});
+  
 map.on('load', function () {
     
   map.addSource('watts-curfew-map-dupwjz', {
