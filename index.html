@@ -73,6 +73,22 @@
         };
         document.onmouseup = function(e) {
             start = null;
+		var overlay = L.mapbox.tileLayer('andy-rutkowski.cbzfjftf',{zIndex: 2, opacity:.5}).addTo(map);
+        document.onmousemove = function(e) {
+            if (!start) return;
+            // Adjust control.
+            handle.style.top = Math.max(-5, Math.min(195, startTop + parseInt(e.clientY, 10) - start)) + 'px';
+            // Adjust opacity.
+            overlay.setOpacity(1 - (handle.offsetTop / 200));
+        };
+        handle.onmousedown = function(e) {
+            // Record initial positions.
+            start = parseInt(e.clientY, 10);
+            startTop = handle.offsetTop - 5;
+            return false;
+        };
+        document.onmouseup = function(e) {
+            start = null;
         };
 	</script>
 </body>
