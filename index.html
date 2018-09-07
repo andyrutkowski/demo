@@ -2,154 +2,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset='utf-8' />
-    <title>Show and hide layers</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.48.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.48.0/mapbox-gl.css' rel='stylesheet' />
-    <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
-    </style>
-</head>
-<body>
-
+	<title>Homeowners Loan Corporation Map</title>
+	<meta charset="utf-8" />
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.9/mapbox.css' rel='stylesheet' />
+	<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <style>
-    #menu {
-        background: #fff;
-        position: relative;
-        z-index: 1;
-        top: 10px;
-        right: 10px;
-        border-radius: 3px;
-        width: 120px;
-        border: 1px solid rgba(0,0,0,0.4);
-        font-family: 'Open Sans', sans-serif;
-    }
-
-    #menu a {
-        font-size: 13px;
-        color: #404040;
-        display: block;
-        margin: 0;
-        padding: 0;
-        padding: 10px;
-        text-decoration: none;
-        border-bottom: 1px solid rgba(0,0,0,0.25);
-        text-align: center;
-    }
-
-    #menu a:last-child {
-        border: none;
-    }
-
-    #menu a:hover {
-        background-color: #f8f8f8;
-        color: #404040;
-    }
-
-    #menu a.active {
-        background-color: #3887be;
-        color: #ffffff;
-    }
-
-    #menu a.active:hover {
-        background: #3074a4;
+.ui-opacity {
+  background:#FFF;
+  position:absolute;
+  left:10px;
+  top:70px;
+  height:200px;
+  width:28px;
+  border:1px solid rgba(0,0,0,0.4);
+  border-radius:3px;
+  z-index:1000;
+  }
+.ui-opacity .handle {
+  position:absolute;
+  background:#404040;
+  left:0;
+  top:100px;
+  width:26px;
+  height:10px;
+  border-radius:1px;
+  cursor:pointer;
+  cursor:ns-resize;
+  }
+  .ui-opacity .handle:hover {
+    background:#303030;
     }
 </style>
+</head>
+<body>
+<div id='map'></div>
+<div id='control' class='ui-opacity'>
+  <div id='handle' class='handle'></div>
+</div>
 
-<nav id="menu"></nav>
-<div id="map"></div>
-
-<script>
-mapboxgl.accessToken = 'pk.eyJ1IjoiYW5keS1ydXRrb3dza2kiLCJhIjoiWDJRMFVUWSJ9.iHl6Cf0M79wmHQlfP6Bk8Q';
-var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/andy-rutkowski/cj5ij2u2056372srpho3je4dl',
-    zoom: 8,
-    center: [-118.296271, 33.989834]
-});
-
-  map.on('click', function(e) {
-  var features = map.queryRenderedFeatures(e.point, {
-    layers: ['47greenbook-dapl9g'] // replace this with the name of the layer
-  });
-
-  if (!features.length) {
-    return;
-  }
-
-  var feature = features[0];
-
-  var popup = new mapboxgl.Popup({ offset: [0, -15] })
-    .setLngLat(feature.geometry.coordinates)
-    .setHTML('<h3>' + feature.properties.Name + '</h3><p>' + feature.properties.Type + '</p>')
-    .setLngLat(feature.geometry.coordinates)
-    .addTo(map);
-});
-  
-map.on('load', function () {
-    
-  map.addSource('watts-curfew-map-dupwjz', {
-        type: 'raster',
-        url: 'mapbox://andy-rutkowski.0tqu2dvy'
-    });
-    map.addLayer({
-        'id': 'Watts',
-        'type': 'raster',
-        'source': 'watts-curfew-map-dupwjz',
-        'layout': {
-            'visibility': 'visible'
-        },
-        'source-layer': 'watts-curfew-map-dupwjz'
-    });
-
-    map.addSource('CA_LosAngeles1_193911-3w46o8', {
-        type: 'raster',
-        url: 'mapbox://andy-rutkowski.cbzfjftf'
-    });
-    map.addLayer({
-        'id': 'HOLC',
-        'type': 'raster',
-        'source': 'CA_LosAngeles1_193911-3w46o8',
-        'source-layer': 'CA_LosAngeles1_193911-3w46o8',
-        'layout': {
-            'visibility': 'visible',
-        },
-    });
-});
-
-var toggleableLayerIds = [ 'Watts', 'HOLC' ];
-
-for (var i = 0; i < toggleableLayerIds.length; i++) {
-    var id = toggleableLayerIds[i];
-
-    var link = document.createElement('a');
-    link.href = '#';
-    link.className = 'active';
-    link.textContent = id;
-
-    link.onclick = function (e) {
-        var clickedLayer = this.textContent;
-        e.preventDefault();
-        e.stopPropagation();
-
-        var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
-
-        if (visibility === 'visible') {
-            map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-            this.className = '';
-        } else {
-            this.className = 'active';
-            map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-        }
-    };
-
-    var layers = document.getElementById('menu');
-    layers.appendChild(link);
-}
-
-</script>
-
+	<script>
+        L.mapbox.accessToken = 'pk.eyJ1IjoiYW5keS1ydXRrb3dza2kiLCJhIjoiWDJRMFVUWSJ9.iHl6Cf0M79wmHQlfP6Bk8Q'; 
+        var handle = document.getElementById('handle'),
+            start = false,
+            startTop;
+        
+        var map = L.mapbox.map('map','',{maxZoom: 13,minZoom: 10})
+        .setView([34.052234, -118.243685], 11);
+        var racialdotmap = L.tileLayer('http://demographics.virginia.edu/DotMap/tiles4/{z}/{x}/{y}.png').addTo(map);
+        
+        var stamenLayer = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a                                       href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>.'
+}).setOpacity(.5).addTo(map);
+        
+        var overlay = L.mapbox.tileLayer('cruzin73vw.7e1be19c',{zIndex: 2, opacity:.5}).addTo(map);
+        document.onmousemove = function(e) {
+            if (!start) return;
+            // Adjust control.
+            handle.style.top = Math.max(-5, Math.min(195, startTop + parseInt(e.clientY, 10) - start)) + 'px';
+            // Adjust opacity.
+            overlay.setOpacity(1 - (handle.offsetTop / 200));
+        };
+        handle.onmousedown = function(e) {
+            // Record initial positions.
+            start = parseInt(e.clientY, 10);
+            startTop = handle.offsetTop - 5;
+            return false;
+        };
+        document.onmouseup = function(e) {
+            start = null;
+        };
+        var overlay = L.mapbox.tileLayer('andy-rutkowski.cbzfjftf',{zIndex: 2, opacity:.5}).addTo(map);
+        document.onmousemove = function(e) {
+            if (!start) return;
+            // Adjust control.
+            handle.style.top = Math.max(-5, Math.min(195, startTop + parseInt(e.clientY, 10) - start)) + 'px';
+            // Adjust opacity.
+            overlay.setOpacity(1 - (handle.offsetTop / 200));
+        };
+        handle.onmousedown = function(e) {
+            // Record initial positions.
+            start = parseInt(e.clientY, 10);
+            startTop = handle.offsetTop - 5;
+            return false;
+        };
+        document.onmouseup = function(e) {
+            start = null;
+        };
+	</script>
 </body>
 </html>
